@@ -1,0 +1,26 @@
+{
+  "name": "MMM-Airly",
+  "version": "1.0.0",
+  "description": "Air Quality from Airly for the Magic Mirror2.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mstarzec386/MMM-Airly.git"
+  },
+  "keywords": [
+    "MagicMirror",
+    "air polution",
+    "Airly"
+  ],
+  "author": "Mateusz Starzec",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mstarzec386/MMM-Airly/issues"
+  },
+  "homepage": "https://github.com/mstarzec386/MMM-Airly#readme",
+  "dependencies": {
+    "request": "~2.83.0"
+  },
+  "devDependencies": {
+    "request": "latest"
+  }
+}

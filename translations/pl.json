@@ -1,0 +1,17 @@
+{
+  "NoSensorID": "Ustaw proszę <i>stationID</i> w konfigu dla modułu: ",
+  "NoApiKey": "Ustaw proszę <i>apiKey</i> w konfigu dla modułu: ",
+  "Loading": "Wczytywanie jakości powietrza ...",
+  "NoData": "brak danych dla ",
+  "Of": "z",
+  "Good": "Dobra",
+  "Moderate": "Średnia",
+  "Low": "Niska",
+  "Unhealthy": "Zła",
+  "VeryUnhealthy": "Bardzo zła",
+  "Hazardous": "Toksyczna",
+  "NowCastErr": "NowCast działa wyłącznie z jednym z: ",
+  "pressure": "Ciśnienie",
+  "humidity": "Wilgotność",
+  "temperature": "Temperatura"
+}
