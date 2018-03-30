@@ -34,6 +34,21 @@ For example https://map.airly.eu/pl/#latitude=49.69678&longitude=18.99732&id=287
   sensorID: 2878
 ```
 
+### ApiKey
+Go to Airly website (https://map.airly.eu/pl/) and turn on developers tools.
+Click on any sensor and check network tab in developers tools.
+There should be a request to Airly API with ApiKey in query string.
+
+For example Request URL: https://airapi.airly.eu/v1//sensorsWithWios/current?southwestLat=50.05844384071677&southwestLong=19.88460435485831&northeastLat=50.077230559338965&northeastLong=20.00820054626456&apikey=fae55480ef384880871f8b40e77bbef9 would be:
+```
+  apiKey: fae55480ef384880871f8b40e77bbef9
+```
+Or you can use curl script:
+```
+$ curl -X GET 'https://map.airly.eu/js/all.min.js?v=0.1.95' 2>&1 |grep -i apikey | sed 's/.*\("apikey=[^"]*"\).*/\1/'
+"apikey=fae55480ef384880871f8b40e77bbef9"
+```
+
 You may want to set the following options in the config section as well:
 
 | Option |  Description | 
