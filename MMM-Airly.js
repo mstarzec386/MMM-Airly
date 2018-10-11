@@ -137,15 +137,15 @@ Module.register('MMM-Airly', {
             }
 
             if (this.config.showMeteo) {
-                let temperature = pollution.temperature;
-                let humidity = pollution.humidity;
-                let pressure = pollution.pressure;
+                let temperature = isNaN(parseFloat(pollution.temperature)) ? '-' : (Math.round(pollution.temperature * 10) / 10).toString().replace('.', ',');
+                let humidity = isNaN(parseFloat(pollution.humidity)) ? '-' : (Math.round(pollution.humidity * 10) / 10).toString().replace('.', ',');
+                let pressure = isNaN(parseFloat(pollution.pressure)) ? '-' : Math.round(pollution.pressure / 100).toString().replace('.', ',');
 
                 meteo += this.html.meteoTr.format(
                     this.html.meteoIcon,
-                    this.html.meteoValues.format((Math.round(temperature * 10) / 10).toString().replace('.', ','), this.config.units['temperature']),
-                    this.html.meteoValues.format((Math.round(humidity * 10) / 10).toString().replace('.', ','), this.config.units['humidity']),
-                    this.html.meteoValues.format(Math.round(pressure / 100).toString().replace('.', ','), this.config.units['pressure'])
+                    this.html.meteoValues.format(temperature, this.config.units['temperature']),
+                    this.html.meteoValues.format(humidity, this.config.units['humidity']),
+                    this.html.meteoValues.format(pressure, this.config.units['pressure'])
                 )
             }
 
