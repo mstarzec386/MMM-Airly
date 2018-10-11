@@ -17,7 +17,7 @@ To run the module, you need to add the following data to your config.js file.
   module: 'MMM-Airly',
   position: 'top_center', // you may choose any location
   config: {
-    sensornID: 2878, // the sensor ID to check the pollution for
+    sensorID: 2878, // the sensor ID to check the pollution for
     apiKey: 'xyz', // Airly apiKey
     showLocation: true,
     showValues: true,

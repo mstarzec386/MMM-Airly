@@ -1,5 +1,5 @@
 {
-  "NoSensorID": "Ustaw proszę <i>stationID</i> w konfigu dla modułu: ",
+  "NoSensorID": "Ustaw proszę <i>sensorID</i> w konfigu dla modułu: ",
   "NoApiKey": "Ustaw proszę <i>apiKey</i> w konfigu dla modułu: ",
   "Loading": "Wczytywanie jakości powietrza ...",
   "NoData": "brak danych dla ",

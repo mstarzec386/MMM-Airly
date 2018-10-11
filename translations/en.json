@@ -1,5 +1,5 @@
 {
-  "NoSensorID": "Please set the <i>stationID</i> in the config for module: ",
+  "NoSensorID": "Please set the <i>sensorID</i> in the config for module: ",
   "NoApiKey": "Please set the <i>apiKey</i> in the config for module: ",
   "Loading": "Loading air quality data ...",
   "NoData": "No data for ",
