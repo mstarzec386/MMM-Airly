@@ -1,14 +1,14 @@
-﻿td:first-of-type {
+.MMM-Airly td:first-of-type {
   text-align: center;
 }
-td:not(:first-of-type) {
+.MMM-Airly td:not(:first-of-type) {
   text-align: left;
   padding-left: 5px;
 }
-td.light {
+.MMM-Airly td.light {
   font-size: 70%;
 }
-caption {
+.MMM-Airly caption {
     text-align: center;
     opacity: 0.5;
 }

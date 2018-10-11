@@ -96,7 +96,7 @@ Module.register('MMM-Airly', {
     getStyles: function() {
         return [
             'https://use.fontawesome.com/releases/v5.0.6/css/all.css',
-            'StyleSheet.css',
+            'MMM-Airly.css',
         ];
     },
     getDom: function() {
