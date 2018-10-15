@@ -16,11 +16,6 @@ var units = {
     temperature: '°C'
 }
 
-Date.prototype.addHours = function (h) {
-    this.setHours(this.getHours() + h);
-    return this;
-}
-
 Module.register('MMM-Airly', {
     defaults: {
         showDates: false,
@@ -61,24 +56,25 @@ Module.register('MMM-Airly', {
 
     },
     socketNotificationReceived: function (notification, payload) {
-        var that = this;
+      if (payload.sensorID === this.config.sensorID) {
         switch (notification) {
-            case 'DATA':
-                that.data.pollution = payload;
-                that.loaded = true;
-                that.updateDom(that.animationSpeed);
-                break;
-            case 'LOC':
-                that.data.address = payload
-                that.updateDom(that.animationSpeed);
-                break;
-            case 'ERR':
-                console.log('error :(', payload)
-                break;
-            default:
-                console.log ('wrong socketNotification', notification, payload)
-                break;
+          case 'DATA':
+            this.data.pollution = payload;
+            this.loaded = true;
+            this.updateDom(this.animationSpeed);
+            break;
+          case 'LOC':
+            this.data.address = payload
+            this.updateDom(this.animationSpeed);
+            break;
+          case 'ERR':
+            console.log('error :(', payload)
+            break;
+          default:
+            console.log('wrong socketNotification', notification, payload)
+            break;
         }
+      }
     },
     html: {
         icon: '<i class="fa fa-leaf"></i>',
@@ -95,7 +91,7 @@ Module.register('MMM-Airly', {
     },
     getStyles: function() {
         return [
-            'https://use.fontawesome.com/releases/v5.0.6/css/all.css',
+            'font-awesome.css',
             'MMM-Airly.css',
         ];
     },
@@ -170,14 +166,6 @@ Module.register('MMM-Airly', {
         else if(pollution < this.config.pollutionNorm[type] * 4) return this.translate('Unhealthy');
         else if(pollution < this.config.pollutionNorm[type] * 6) return this.translate('VeryUnhealthy');
         else                                                     return this.translate('Hazardous');
-    },
-    compare: function(a, b) {
-        if (a.value / pollutionNorm[a.key] < b.value / pollutionNorm[b.key])
-            return 1;
-        else if (a.value / pollutionNorm[a.key] > b.value / pollutionNorm[b.key])
-            return -1;
-        else
-            return 0;
     },
     color: function (x) {
         //color palete from https://en.wikipedia.org/wiki/Air_quality_index#india

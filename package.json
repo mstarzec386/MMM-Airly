@@ -12,6 +12,13 @@
     "Airly"
   ],
   "author": "Mateusz Starzec",
+  "contributors": [
+    {
+      "name": "Marcin Bielecki",
+      "email": "santanachia@gmail.com",
+      "url": "https://github.com/Santanachia"
+    }
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/mstarzec386/MMM-Airly/issues"
