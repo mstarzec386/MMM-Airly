@@ -2,95 +2,125 @@
 const NodeHelper = require('node_helper');
 
 module.exports = NodeHelper.create({
-    socketNotificationReceived(notification, payload) {
-        var that = this;
+  socketNotificationReceived(notification, payload) {
+    var that = this;
 
-        switch(notification) {
-            case 'GET_DATA':
-                request('https://airapi.airly.eu/v1/sensor/measurements?sensorId=' + payload.sensorID + '&historyHours=1&historyResolutionHours=1&apikey=' + payload.apiKey, function (error, response, body) {
-                    if (error) {
-                        that.sendSocketNotification('ERR', { type: 'request error', msg: error });
-                    }
+    switch (notification) {
+      case 'GET_DATA':
+        request(
+          'https://airapi.airly.eu/v2/measurements/installation?apikey=' +
+            payload.apiKey +
+            '&installationId=' +
+            payload.sensorID +
+            '&indexType=AIRLY_CAQI&indexPollutant=PM',
+          function(error, response, body) {
+            if (error) {
+              console.error('GET_DATA error:', error.message);
 
-                    if (response.statusCode != 200) {
-                        that.sendSocketNotification('ERR', { type: 'request statusCode', msg: response && response.statusCode });
-                    }
+              return that.sendSocketNotification('ERR', {
+                type: 'request error',
+                msg: error,
+              });
+            }
 
-                    if (!error & response.statusCode == 200) {
-                        let data;
+            if (response.statusCode != 200) {
+              console.error('GET_DATA wrong status code:', response.statusCode);
 
-                        try {
-                            data = JSON.parse(body);
-                        } catch (e) {
-                            return that.sendSocketNotification('ERR', { type: 'request error', msg: error });
-                        }
+              return that.sendSocketNotification('ERR', {
+                type: 'request statusCode',
+                msg: response && response.statusCode,
+              });
+            }
 
-                        that.sendSocketNotification('DATA', data.currentMeasurements)
-                    }
+            if (!error & (response.statusCode == 200)) {
+              let data;
+
+              try {
+                data = JSON.parse(body);
+              } catch (e) {
+                console.error('GET_DATA json parse:', e.message);
+
+                return that.sendSocketNotification('ERR', {
+                  type: 'request error',
+                  msg: error,
                 });
-                break;
-            case 'GET_LOC':
-                request('https://airapi.airly.eu/v1//sensors/' + payload.sensorID + '?apikey=' + payload.apiKey, function (error, response, body) {
-                    if (error) {
-                        that.sendSocketNotification('ERR', { type: 'request error', msg: error });
-                    }
+              }
 
-                    if (response.statusCode != 200) {
-                        that.sendSocketNotification('ERR', { type: 'request statusCode', msg: response && response.statusCode });
-                    }
+              that.sendSocketNotification(
+                'DATA',
+                translateMesurementsFromV2(data)
+              );
+            }
+          }
+        );
+        break;
+      case 'GET_LOC':
+        request(
+          'https://airapi.airly.eu/v2/installations/' +
+            payload.sensorID +
+            '?apikey=' +
+            payload.apiKey,
+          function(error, response, body) {
+            if (error) {
+              console.error('GET_LOC error:', error.message);
 
-                    if (!error & response.statusCode == 200) {
-                        let data;
+              return that.sendSocketNotification('ERR', {
+                type: 'request error',
+                msg: error,
+              });
+            }
 
-                        try {
-                            data = JSON.parse(body);
-                        } catch (e) {
-                            return that.sendSocketNotification('ERR', { type: 'request error', msg: error });
-                        }
+            if (response.statusCode != 200) {
+              console.error('GET_LOC wrong status code:', response.statusCode);
 
-                        that.sendSocketNotification('LOC', data.address);
-                    }
+              return that.sendSocketNotification('ERR', {
+                type: 'request statusCode',
+                msg: response && response.statusCode,
+              });
+            }
+
+            if (!error & (response.statusCode == 200)) {
+              let data;
+
+              try {
+                data = JSON.parse(body);
+              } catch (e) {
+                console.error('GET_LOC json parse error:', e.message);
+
+                return that.sendSocketNotification('ERR', {
+                  type: 'request error',
+                  msg: error,
                 });
+              }
 
-                break;
-        }
+              that.sendSocketNotification('LOC', data.address);
+            }
+          }
+        );
+
+        break;
     }
+  },
 });
 
-var nowcast = function(values, pollutionType) {
-    var len = 'O3' == pollutionType ? 8 : 12
-    var pollutions = []
-    for (let pol of values) {
-        if (pol[1]) {
-            pollutions.push(pol[1])
-            if (pollutions.length >= len) {
-                break
-            }
-        }
-    }
+function translateMesurementsFromV2(data) {
+  var v1 = {};
 
-    // math from: https://en.wikipedia.org/wiki/NowCast_(air_quality_index)
-    var w = Math.min(...pollutions) / Math.max(...pollutions)
+  if (!data.current) {
+    return v1;
+  }
 
-    if (1 == w) {
-        return pollutions[0]
-    }
+  var current = data.current;
 
-    if (pollutionType != 'O3') {
-        w = w > .5 ? w : .5
+  if (current.values && Array.isArray(current.values)) {
+    current.values.forEach(function(value) {
+      v1[value.name.toLowerCase()] = value.value;
+    });
+  }
 
-        if (.5 == w) {
-            var ncl = 0
-            for (i = 0; i < pollutions.length; i++) {
-                ncl += Math.pow(.5, i + 1) * pollutions[i];
-            }
-            return (ncl);
-        }
-    }
-    var ncl = 0, ncm = 0
-    for (i = 0; i < pollutions.length; i++) {
-        ncl += Math.pow(w, i) * pollutions[i];
-        ncm += Math.pow(w, i)
-    }
-    return (ncl / ncm);
+  if (current.indexes) {
+    //TODO add desciption?
+  }
+
+  return v1;
 }
