@@ -112,14 +112,20 @@ function translateMesurementsFromV2(data) {
 
   var current = data.current;
 
+
   if (current.values && Array.isArray(current.values)) {
     current.values.forEach(function(value) {
       v1[value.name.toLowerCase()] = value.value;
     });
   }
 
-  if (current.indexes) {
-    //TODO add desciption?
+  if (current.indexes && Array.isArray(current.indexes)) {
+    current.indexes.forEach(function(value) {
+      v1[value.name.toLowerCase()] = value.value;
+      v1[value.name.toLowerCase() + '_color'] = value.color.toLowerCase();
+      v1[value.name.toLowerCase() + '_advice'] = value.advice;
+      v1[value.name.toLowerCase() + '_description'] = value.description;
+    });
   }
 
   return v1;
