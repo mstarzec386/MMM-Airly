@@ -59,6 +59,7 @@ You may want to set the following options in the config section as well:
 | `showLocation` | Toggle location printing<br><br>**Possible values:** `true` or `false`<br>**Default value:** `true` |
 | `showMeteo` | Toggle meteo printing<br><br>**Possible values:** `true` or `false`<br>**Default value:** `false` |
 | `showValues` | Toggle values printing<br><br>**Possible values:** `true` or `false`<br>**Default value:** `false` | 
+| `showCaqi` | Toggle CAQI index and advice printing<br><br>**Possible values:** `true` or `false`<br>**Default value:** `true` | 
 | `animationSpeed` | Speed of the update animation. (Milliseconds)<br><br>**Possible values:** `0` to `5000`<br>**Default value:** `1000` (1 second) | 
 | `colors` | Makes pollution colorful<br><br>**Possible values:** `true` or `false`<br>**Default value:** `false` | 
 | `fontSize` | Sets the base font-size to a percent of the default value<br><br>**Default value:** `100` | 
