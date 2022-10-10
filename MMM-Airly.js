@@ -129,7 +129,7 @@ Module.register('MMM-Airly', {
 
       if (this.config.showCaqi) {
         tbody += this.html.caqiBox.format(this.config.colors ? pollution['airly_caqi_color'] + ';color:' : '',
-		    Math.round(pollution['airly_caqi']));
+            Math.round(pollution['airly_caqi']));
         tbody += this.html.caqiAdvice.format(pollution['airly_caqi_description'], pollution['airly_caqi_advice']);
       }
 
@@ -149,11 +149,11 @@ Module.register('MMM-Airly', {
             this.config.showValues
               ? this.html.values.format(
                   (Math.round(value * 10) / 10).toString().replace('.', ','),
-	              this.config.units[key],
+                  this.config.units[key],
                   (Math.round(value * 100 / this.config.pollutionNorm[key])).toString().replace('.', ','),
                 )
               : '',
-			this.config.showDescription ? this.impact(value, key) : '',
+            this.config.showDescription ? this.impact(value, key) : '',
             ''
           );
         }
@@ -175,17 +175,17 @@ Module.register('MMM-Airly', {
           : Math.round(pollution.pressure)
               .toString()
               .replace('.', ',');
-		let windSpeed = isNaN(parseFloat(pollution.wind_speed))
-			? '-'
-			: (Math.round(pollution.wind_speed * 10) / 10)
-				.toString()
-				.replace('.', ',');
+        let windSpeed = isNaN(parseFloat(pollution.wind_speed))
+            ? '-'
+            : (Math.round(pollution.wind_speed * 10) / 10)
+                .toString()
+                .replace('.', ',');
         meteo += this.html.meteoTr.format(
           this.html.meteoIcon,
           this.html.meteoValues.format(temperature, this.config.units['temperature']),
           this.html.meteoValues.format(pressure, this.config.units['pressure']),
           this.html.meteoValues.format(windSpeed, this.config.units['wind']),
-	      this.html.meteoValues.format(humidity, this.config.units['humidity']),
+          this.html.meteoValues.format(humidity, this.config.units['humidity']),
         );
       }
 
