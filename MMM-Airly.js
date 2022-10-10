@@ -14,6 +14,7 @@ var units = {
   pressure: 'hPa',
   humidity: '%',
   temperature: '°C',
+  wind: 'km/h',
 };
 
 Date.prototype.addHours = function(h) {
@@ -54,12 +55,16 @@ Module.register('MMM-Airly', {
 
     if (!this.data.address && this.config.showLocation) {
       this.sendSocketNotification('GET_LOC', {
+        latitude: that.config.latitude,
+        longitude: that.config.longitude,
         sensorID: that.config.sensorID,
         apiKey: that.config.apiKey,
       });
     }
 
     this.sendSocketNotification('GET_DATA', {
+      latitude: that.config.latitude,
+      longitude: that.config.longitude,
       sensorID: that.config.sensorID,
       apiKey: that.config.apiKey,
     });
@@ -88,13 +93,11 @@ Module.register('MMM-Airly', {
     icon: '<i class="fa fa-leaf"></i>',
     meteoIcon: '<i class="fas fa-thermometer-empty">',
     location: '<div class="xsmall">{0} {1}, {2}, {3}</div>',
-    values: '({0} {1} {2}{3})',
-    meteoValues: ' {0}{1}',
-    quality:
-      '<table><caption>{0}</caption><tbody style="font-size: {1}%">{2}</tbody></table>',
-    qualityTr:
-      '<tr{0}><td>{1}</td><td>{2}</td><td>{3}</td><td class="light">{4}</td><td class="light">{5}</td></tr>',
-    meteoTr: '<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>',
+    values: '{0} {1} ({2}%)',
+    meteoValues: '{0}{1}',
+    quality: '<table><caption>{0}</caption><tbody style="font-size: {1}%">{2}</tbody></table>',
+    qualityTr: '<tr{0}><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td><td class="light">{5}</td></tr>',
+    meteoTr: '<tr><td>{0}</td><td>{1}</td><td>{2}&nbsp;&nbsp;&nbsp;{3}</td><td>{4}</td></tr>',
     caqiBox: '<tr><td colspan="4" style="line-height: 500%"><div style="position:relative; left:25%; width:50%"><div style="background-color:{0}black"><div style="font-size: 500%">{1}</div><div style="line-height: 100%; padding-bottom:10px">CAQI</div></div></div></td></tr>',
     caqiAdvice: '<tr><td colspan="4" style="font-size: 50%">{0} {1}</td></tr>',
   },
@@ -109,7 +112,7 @@ Module.register('MMM-Airly', {
   },
   getDom: function() {
     var wrapper = document.createElement('div');
-    if (!this.config.sensorID) {
+    if (!this.config.sensorID && (!this.config.latitude || !this.config.longitude)) {
       wrapper.innerHTML = this.translate('NoSensorID') + this.name + '.';
       wrapper.className = 'dimmed light small';
     } else if (!this.loaded) {
@@ -126,7 +129,7 @@ Module.register('MMM-Airly', {
 
       if (this.config.showCaqi) {
         tbody += this.html.caqiBox.format(this.config.colors ? pollution['airly_caqi_color'] + ';color:' : '',
-		    Math.round(pollution['airly_caqi']));
+            Math.round(pollution['airly_caqi']));
         tbody += this.html.caqiAdvice.format(pollution['airly_caqi_description'], pollution['airly_caqi_advice']);
       }
 
@@ -143,15 +146,14 @@ Module.register('MMM-Airly', {
               : '',
             this.html.icon,
             this.config.pollutionTypeH[key],
-            this.config.showDescription ? this.impact(value, key) : '',
             this.config.showValues
               ? this.html.values.format(
                   (Math.round(value * 10) / 10).toString().replace('.', ','),
-                  this.translate('Of'),
-                  this.config.pollutionNorm[key],
-                  this.config.units[key]
+                  this.config.units[key],
+                  (Math.round(value * 100 / this.config.pollutionNorm[key])).toString().replace('.', ','),
                 )
               : '',
+            this.config.showDescription ? this.impact(value, key) : '',
             ''
           );
         }
@@ -170,26 +172,28 @@ Module.register('MMM-Airly', {
               .replace('.', ',');
         let pressure = isNaN(parseFloat(pollution.pressure))
           ? '-'
-          : Math.round(pollution.pressure / 100)
+          : Math.round(pollution.pressure)
               .toString()
               .replace('.', ',');
-
+        let windSpeed = isNaN(parseFloat(pollution.wind_speed))
+            ? '-'
+            : (Math.round(pollution.wind_speed * 10) / 10)
+                .toString()
+                .replace('.', ',');
         meteo += this.html.meteoTr.format(
           this.html.meteoIcon,
-          this.html.meteoValues.format(
-            temperature,
-            this.config.units['temperature']
-          ),
+          this.html.meteoValues.format(temperature, this.config.units['temperature']),
+          this.html.meteoValues.format(pressure, this.config.units['pressure']),
+          this.html.meteoValues.format(windSpeed, this.config.units['wind']),
           this.html.meteoValues.format(humidity, this.config.units['humidity']),
-          this.html.meteoValues.format(pressure, this.config.units['pressure'])
         );
       }
-      
+
       wrapper.innerHTML = this.html.quality.format(
         this.config.showLocation && this.data.address
           ? this.html.location.format(
-              this.data.address.street,
-              this.data.address.number,
+              this.data.address.street || this.data.address.road,
+              this.data.address.number || this.data.address.house_number,
               this.data.address.city,
               this.data.address.country
             )
