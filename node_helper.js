@@ -6,13 +6,15 @@ module.exports = NodeHelper.create({
     var that = this;
 
     switch (notification) {
-      case 'GET_DATA':
+		case 'GET_DATA':
         request(
-          'https://airapi.airly.eu/v2/measurements/installation?apikey=' +
-            payload.apiKey +
-            '&installationId=' +
-            payload.sensorID +
-            '&indexType=AIRLY_CAQI&indexPollutant=PM',
+          payload.latitude && payload.longitude
+          	? 'https://airapi.airly.eu/v2/measurements/point?&apikey=' + payload.apiKey +
+			  '&lat=' + payload.latitude + '&lng=' + payload.longitude +
+			  '&indexType=AIRLY_CAQI&indexPollutant=PM&includeWind=true'
+		  	: 'https://airapi.airly.eu/v2/measurements/installation?apikey=' + payload.apiKey +
+			  '&installationId=' + payload.sensorID +
+			  '&indexType=AIRLY_CAQI&indexPollutant=PM&includeWind=true',
           function(error, response, body) {
             if (error) {
               console.error('GET_DATA error:', error.message);
@@ -56,10 +58,9 @@ module.exports = NodeHelper.create({
         break;
       case 'GET_LOC':
         request(
-          'https://airapi.airly.eu/v2/installations/' +
-            payload.sensorID +
-            '?apikey=' +
-            payload.apiKey,
+	       payload.longitude && payload.longitude
+			   ? 'https://nominatim.airly.org/reverse?format=json&lat=' + payload.latitude + '&lon=' + payload.longitude
+			   : 'https://airapi.airly.eu/v2/installations/' + payload.sensorID + '?apikey=' + payload.apiKey,
           function(error, response, body) {
             if (error) {
               console.error('GET_LOC error:', error.message);
