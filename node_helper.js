@@ -50,7 +50,7 @@ module.exports = NodeHelper.create({
 
               that.sendSocketNotification(
                 'DATA',
-                translateMesurementsFromV2(data)
+                translateMeasurementsFromV2(data)
               );
             }
           }
@@ -104,7 +104,7 @@ module.exports = NodeHelper.create({
   },
 });
 
-function translateMesurementsFromV2(data) {
+function translateMeasurementsFromV2(data) {
   var v1 = {};
 
   if (!data.current) {
@@ -127,6 +127,12 @@ function translateMesurementsFromV2(data) {
       v1[value.name.toLowerCase() + '_advice'] = value.advice;
       v1[value.name.toLowerCase() + '_description'] = value.description;
     });
+  }
+
+  if (current.standards && Array.isArray(current.standards)) {
+	  current.standards.forEach(function(value) {
+		  v1[value.pollutant.toLowerCase() + '_standard'] = value.limit;
+	  });
   }
 
   return v1;

@@ -4,10 +4,6 @@ var pollutionTypeH = {
   pm10: 'PM10',
   pm25: 'PM2.5',
 };
-var pollutionNorm = {
-  pm10: 50,
-  pm25: 25,
-};
 var units = {
   pm10: 'µg/m³',
   pm25: 'µg/m³',
@@ -39,7 +35,6 @@ Module.register('MMM-Airly', {
     Log.info('Starting module: ' + this.name);
 
     this.config.pollutionTypeH = pollutionTypeH;
-    this.config.pollutionNorm = pollutionNorm;
     this.config.units = units;
 
     this.config.fontSize = parseInt(this.config.fontSize);
@@ -136,12 +131,13 @@ Module.register('MMM-Airly', {
       for (let i = 0; i < keys.length; i++) {
         let key = keys[i];
         let value = pollution[key];
+        let standard = pollution[key+ '_standard'];
 
         if (['pm10', 'pm25'].indexOf(key) > -1) {
           tbody += this.html.qualityTr.format(
             this.config.colors
               ? ' style="color:' +
-                  this.color(value / this.config.pollutionNorm[key]) +
+                  this.color(value / standard) +
                   '"'
               : '',
             this.html.icon,
@@ -150,10 +146,10 @@ Module.register('MMM-Airly', {
               ? this.html.values.format(
                   (Math.round(value * 10) / 10).toString().replace('.', ','),
                   this.config.units[key],
-                  (Math.round(value * 100 / this.config.pollutionNorm[key])).toString().replace('.', ','),
+                  (Math.round(value * 100 / standard)).toString(),
                 )
               : '',
-            this.config.showDescription ? this.impact(value, key) : '',
+            this.config.showDescription ? this.impact(value, standard) : '',
             ''
           );
         }
@@ -210,25 +206,18 @@ Module.register('MMM-Airly', {
       pl: 'translations/pl.json',
     };
   },
-  impact: function(pollution, type) {
-    if (pollution < this.config.pollutionNorm[type])
+  impact: function(pollution, standard) {
+    if (pollution < standard)
       return this.translate('Good');
-    else if (pollution < this.config.pollutionNorm[type] * 2)
+    else if (pollution < standard * 2)
       return this.translate('Moderate');
-    else if (pollution < this.config.pollutionNorm[type] * 3)
+    else if (pollution < standard * 3)
       return this.translate('Low');
-    else if (pollution < this.config.pollutionNorm[type] * 4)
+    else if (pollution < standard * 4)
       return this.translate('Unhealthy');
-    else if (pollution < this.config.pollutionNorm[type] * 6)
+    else if (pollution < standard * 6)
       return this.translate('VeryUnhealthy');
     else return this.translate('Hazardous');
-  },
-  compare: function(a, b) {
-    if (a.value / pollutionNorm[a.key] < b.value / pollutionNorm[b.key])
-      return 1;
-    else if (a.value / pollutionNorm[a.key] > b.value / pollutionNorm[b.key])
-      return -1;
-    else return 0;
   },
   color: function(x) {
     //color palete from https://en.wikipedia.org/wiki/Air_quality_index#india
