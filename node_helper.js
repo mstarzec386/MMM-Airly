@@ -7,15 +7,15 @@ module.exports = NodeHelper.create({
 
     switch (notification) {
       case 'GET_DATA':
-        request(
-          payload.latitude && payload.longitude
-            ? 'https://airapi.airly.eu/v2/measurements/point?&apikey=' + payload.apiKey +
-              '&lat=' + payload.latitude + '&lng=' + payload.longitude +
-              '&indexType=AIRLY_CAQI&indexPollutant=PM&includeWind=true'
-            : 'https://airapi.airly.eu/v2/measurements/installation?apikey=' + payload.apiKey +
-              '&installationId=' + payload.sensorID +
-              '&indexType=AIRLY_CAQI&indexPollutant=PM&includeWind=true',
-          function(error, response, body) {
+        request({
+	    url: payload.latitude && payload.longitude ?
+		`https://airapi.airly.eu/v2/measurements/point?lat=${payload.latitude}&lng=${payload.longitude}&indexType=AIRLY_CAQI&indexPollutant=PM&includeWind=true` :
+		`https://airapi.airly.eu/v2/measurements/installation?installationId=${payload.sensorID}&indexType=AIRLY_CAQI&indexPollutant=PM&includeWind=true`,
+	    headers: {
+		'Accept': 'application/json',
+		'apikey': payload.apiKey
+	    }
+	}, function(error, response, body) {
             if (error) {
               console.error('GET_DATA error:', error.message);
 
@@ -58,9 +58,20 @@ module.exports = NodeHelper.create({
         break;
       case 'GET_LOC':
         request(
-           payload.longitude && payload.longitude
-               ? 'https://nominatim.airly.org/reverse?format=json&lat=' + payload.latitude + '&lon=' + payload.longitude
-               : 'https://airapi.airly.eu/v2/installations/' + payload.sensorID + '?apikey=' + payload.apiKey,
+   	payload.longitude && payload.longitude ?
+	    {
+		url: `https://nominatim.airly.org/reverse?format=json&lat=${payload.latitude}&lon=${payload.longitude}`,
+		headers: {
+		    'Accept': 'application/json'
+		}
+	    } :
+	    {
+		url: `https://airapi.airly.eu/v2/installations/${payload.sensorID}`,
+		headers: {
+		    'Accept': 'application/json',
+		    'apikey': payload.apiKey
+		}
+	    },
           function(error, response, body) {
             if (error) {
               console.error('GET_LOC error:', error.message);
